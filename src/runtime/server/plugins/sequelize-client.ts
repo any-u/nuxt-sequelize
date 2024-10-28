@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize'
 import { defineNitroPlugin } from 'nitropack/runtime'
+import { useRuntimeConfig } from '#imports'
 import { options } from '#nuxt-sequelize-options'
 
 export default defineNitroPlugin(() => {
