@@ -1,3 +1,4 @@
+import { defineNitroPlugin } from 'nitropack/runtime'
 import { defineSequelizeModel as defineModel } from '../utils/defineSequelizeModel'
 
 export default defineNitroPlugin(() => {
