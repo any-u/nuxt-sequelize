@@ -7,78 +7,156 @@ Find and replace all on all files (CMD+SHIFT+F):
 - Description: My new Nuxt module
 -->
 
-# My Module
+# nuxt-sequelize
 
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![License][license-src]][license-href]
-[![Nuxt][nuxt-src]][nuxt-href]
+<!-- Badges Start -->
+<p>
+  <a href="https://npmjs.com/package/nuxt-sequelize">
+    <img src="https://img.shields.io/npm/v/nuxt-sequelize.svg?style=flat-square&colorA=202128&colorB=36936A" alt="Version">
+  </a>
+  <a href="https://npmjs.com/package/nuxt-sequelize">
+    <img src="https://img.shields.io/npm/dm/nuxt-sequelize.svg?style=flat-square&colorA=202128&colorB=36936A" alt="Downloads">
+  </a>
+  <a href="https://github.com/nuxt-sequelize/stargazers">
+    <img src="https://img.shields.io/github/stars/nuxt-sequelize.svg?style=flat-square&colorA=202128&colorB=36936A" alt="Downloads">
+  </a>
+</p>
+<!-- Badges End -->
 
-My new Nuxt module for doing amazing things.
+[Sequelize](https://sequelize.org/) module for [Nuxt](https://v3.nuxtjs.org)
 
-- [✨ &nbsp;Release Notes](/CHANGELOG.md)
-<!-- - [🏀 Online playground](https://stackblitz.com/github/your-org/my-module?file=playground%2Fapp.vue) -->
-<!-- - [📖 &nbsp;Documentation](https://example.com) -->
+## Quick Start
 
-## Features
+1. Add `nuxt-sequelize` dependency to your project
 
-<!-- Highlight some of the features your module provide here -->
-- ⛰ &nbsp;Foo
-- 🚠 &nbsp;Bar
-- 🌲 &nbsp;Baz
+   ```bash
+   npm install nuxt-sequelize
+   ```
 
-## Quick Setup
+2. Add `nuxt-sequelize` to the `modules` section of `nuxt.config.ts`
 
-Install the module to your Nuxt application with one command:
+   ```ts
+   export default defineNuxtConfig({
+     modules: ["nuxt-sequelize"],
+   });
+   ```
 
-```bash
-npx nuxi module add my-module
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+## Usage
+
+### Configuration
+
+1. Configure Nuxt Sequelize with the `sequelize` property.
+
+```ts
+export default defineNuxtConfig({
+  sequelize: {
+    dir: "server/models",
+    options: {},
+  },
+});
 ```
 
-That's it! You can now use My Module in your Nuxt app ✨
+| Key     | Type        | Require | Description                                                                      |
+| ------- | ----------- | ------- | -------------------------------------------------------------------------------- |
+| dir     | string      | false   | Use the dir/ directory to automatically register models within your application. |
+| options | UserOptions | false   | Sequelize options                                                                |
+
+2. Configure Sequelize secret via `.env`
+
+```sh
+NUXT_SEQUELIZE_DIALECT='mysql'
+NUXT_SEQUELIZE_DATABASE=''
+NUXT_SEQUELIZE_HOST=""
+NUXT_SEQUELIZE_PORT=3306
+NUXT_SEQUELIZE_USERNAME="admin"
+NUXT_SEQUELIZE_PASSWORD="admin"
+```
+
+### Define Model
+Files created under the model directory will be automatically registered under the sequelize object. The filename will be used as the model name.
+
+> The model file must be a js file. Because Nuxt currently does not support dynamic import.
+
+```ts
+// models/user.js
+import { DataTypes } from "sequelize";
+
+export default defineSequelizeModel({
+  // ...ModelAttributes
+});
+```
+
+### Use
+Get the model collection through `useSequelize`, and then use its attributes directly
+```ts
+// server/routes/hello.get.ts
+export default defineEventHandler(async () => {
+  const sequelize = useSequelize()
+  const result = await sequelize.user.findAll()
+  return result
+})
+
+```
 
 
-## Contribution
+## Composables
 
-<details>
-  <summary>Local development</summary>
-  
-  ```bash
-  # Install dependencies
-  npm install
-  
-  # Generate type stubs
-  npm run dev:prepare
-  
-  # Develop with the playground
-  npm run dev
-  
-  # Build the playground
-  npm run dev:build
-  
-  # Run ESLint
-  npm run lint
-  
-  # Run Vitest
-  npm run test
-  npm run test:watch
-  
-  # Release new version
-  npm run release
-  ```
+### `defineSequelizeModel`
 
-</details>
+This function help to create a new Sequelize model. Example usage
 
+#### Using `sequelize.define`:
 
-<!-- Badges -->
-[npm-version-src]: https://img.shields.io/npm/v/my-module/latest.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-version-href]: https://npmjs.com/package/my-module
+```ts
+// models/user.js
+import { DataTypes } from "sequelize";
 
-[npm-downloads-src]: https://img.shields.io/npm/dm/my-module.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-downloads-href]: https://npmjs.com/package/my-module
+export default defineSequelizeModel({
+  // ...ModelAttributes
+});
+```
 
-[license-src]: https://img.shields.io/npm/l/my-module.svg?style=flat&colorA=020420&colorB=00DC82
-[license-href]: https://npmjs.com/package/my-module
+#### Extending `Model`
 
-[nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt.js
-[nuxt-href]: https://nuxt.com
+```ts
+// models/user.js
+import { DataTypes, Model } from "sequelize";
+
+export default defineSequelizeModel((modelName, sequelize) => {
+  class User extends Model {}
+  User.init(
+    {
+      // ...ModelAttributes
+    },
+    {
+      sequelize,
+      modelName
+    }
+  );
+
+  return User
+});
+```
+
+### `useSequelize`
+Access the model collection of sequelize
+
+```ts
+export default defineEventHandler(async () => {
+  const sequelize = useSequelize()
+})
+```
+
+### `useSequelizeClient`
+Access the instance of sequelize
+```ts
+export default defineEventHandler(async () => {
+  const client = useSequelizeClient()
+})
+```

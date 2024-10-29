@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { addServerImportsDir, addServerPlugin, addTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
 import type { Options } from 'sequelize'
 
-type UserOptions = Exclude<Options, 'database' | 'username' | 'password' | 'host' | 'port' | 'dialect'>
+export type UserOptions = Exclude<Options, 'database' | 'username' | 'password' | 'host' | 'port' | 'dialect'>
 
 export default defineNuxtModule({
   meta: {
