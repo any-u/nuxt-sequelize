@@ -17,8 +17,8 @@ export default defineNuxtConfig({
       },
       define: {
         timestamps: true,
-        createdAt: 'createTime',
-        updatedAt: 'updateTime',
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
       },
     },
   },
