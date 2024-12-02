@@ -28,8 +28,8 @@ export default defineNuxtModule({
     const serverDir = fileURLToPath(new URL('./runtime/server', import.meta.url))
 
     // Inject options via virtual template
-    nuxt.options.alias['#nuxt-sequelize-options'] = addTemplate({
-      filename: 'nuxt-sequelize-options.mjs',
+    nuxt.options.alias['#sequelize'] = addTemplate({
+      filename: 'sequelize.mjs',
       write: true,
       getContents: () => Object.entries(options).map(([key, value]) =>
         `export const ${key} = ${JSON.stringify(value, null, 2)}

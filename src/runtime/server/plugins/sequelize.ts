@@ -4,7 +4,7 @@ import { defineNitroPlugin } from 'nitropack/runtime'
 import type { Model, ModelStatic } from 'sequelize'
 import { useSequelizeClient } from '../composables/useSequelizeClient'
 import { capitalize } from '../utils/utils'
-import { dir } from '#nuxt-sequelize-options'
+import { dir } from '#sequelize'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SequelizeModels = Record<string, ModelStatic<Model<any, any>>>
