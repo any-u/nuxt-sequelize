@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs'
 import { join, basename, extname } from 'node:path'
 import { defineNitroPlugin } from 'nitropack/runtime'
 import type { Model, ModelStatic } from 'sequelize'
-import { useSequelizeClient } from '../composables/useSequelizeClient'
+import { useSequelizeClient } from '../composables/use-sequelize-client'
 import { capitalize } from '../utils/utils'
 import { dir } from '#sequelize'
 
