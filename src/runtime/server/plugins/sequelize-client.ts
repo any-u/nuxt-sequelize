@@ -16,6 +16,7 @@ export default defineNitroPlugin(() => {
       ...options,
     },
   )
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   globalThis.__nuxt_sequelize_client__ = client

@@ -39,6 +39,7 @@ export default defineNuxtModule({
     addServerImportsDir(resolver(serverDir, './composables'))
 
     addServerPlugin(resolver(serverDir, './plugins/define-sequelize-model'))
+    addServerPlugin(resolver(serverDir, './plugins/define-association'))
     addServerPlugin(resolver(serverDir, './plugins/sequelize-client'))
     addServerPlugin(resolver(serverDir, './plugins/sequelize'))
   },

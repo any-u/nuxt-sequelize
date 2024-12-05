@@ -24,14 +24,26 @@ export default defineNitroPlugin(async () => {
 
   const client = useSequelizeClient()
 
+  let associationFn = null
   for (const file of files) {
-    const modelName = capitalize(basename(file, extname(file)))
-    const { default: handler } = await import(join(root, `./${file}`))
-    if (handler) {
-      const model = handler(modelName, client, sequelize)
-      sequelize[modelName] = model
+    const fileName = basename(file, extname(file))
+    if (fileName === 'associations') {
+      const { default: handler } = await import(join(root, file))
+      associationFn = handler
+    }
+    else {
+      const modelName = capitalize(fileName)
+      const { default: handler } = await import(join(root, `./${file}`))
+      if (handler) {
+        const model = handler(modelName, client, sequelize)
+        sequelize[modelName] = model
+      }
     }
   }
+
+  associationFn && associationFn(sequelize)
+
+  // client.sync({ force: true })
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
