@@ -2,8 +2,8 @@ import { readdirSync } from 'node:fs'
 import { join, basename, extname } from 'node:path'
 import { defineNitroPlugin } from 'nitropack/runtime'
 import type { Model, ModelStatic } from 'sequelize'
+import { capitalize } from 'inflection'
 import { useSequelizeClient } from '../composables/use-sequelize-client'
-import { capitalize } from '../utils/utils'
 import { dir } from '#sequelize'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,7 +41,9 @@ export default defineNitroPlugin(async () => {
     }
   }
 
-  associationFn && associationFn(sequelize)
+  if (associationFn) {
+    associationFn(sequelize)
+  }
 
   // client.sync({ force: true })
 

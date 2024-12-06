@@ -4,8 +4,8 @@ import type {
   HasManyOptions,
   HasOneOptions,
 } from 'sequelize'
+import { capitalize } from 'inflection'
 import type { SequelizeModels } from './sequelize'
-import { capitalize } from '../utils/utils'
 
 export interface AssociationEntity<T> {
   name: string
