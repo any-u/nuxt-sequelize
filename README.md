@@ -18,7 +18,7 @@ Find and replace all on all files (CMD+SHIFT+F):
     <img src="https://img.shields.io/npm/dm/nuxt-sequelize.svg?style=flat-square&colorA=202128&colorB=36936A" alt="Downloads">
   </a>
   <a href="https://github.com/nuxt-sequelize/stargazers">
-    <img src="https://img.shields.io/github/stars/nuxt-sequelize.svg?style=flat-square&colorA=202128&colorB=36936A" alt="Downloads">
+    <img src="https://img.shields.io/github/stars/any-u/nuxt-sequelize.svg?style=flat-square&colorA=202128&colorB=36936A" alt="Downloads">
   </a>
 </p>
 <!-- Badges End -->
