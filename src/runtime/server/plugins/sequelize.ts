@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs'
 import { join, basename, extname } from 'node:path'
 import { defineNitroPlugin } from 'nitropack/runtime'
 import type { Model, ModelStatic } from 'sequelize'
-import { capitalize } from 'inflection'
+import { camelize } from 'inflection'
 import { useSequelizeClient } from '../composables/use-sequelize-client'
 import { dir } from '#sequelize'
 
@@ -32,7 +32,7 @@ export default defineNitroPlugin(async () => {
       associationFn = handler
     }
     else {
-      const modelName = capitalize(fileName)
+      const modelName = camelize(fileName)
       const { default: handler } = await import(join(root, `./${file}`))
       if (handler) {
         const model = handler(modelName, client, sequelize)

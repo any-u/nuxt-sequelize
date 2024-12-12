@@ -4,7 +4,7 @@ import type {
   HasManyOptions,
   HasOneOptions,
 } from 'sequelize'
-import { capitalize } from 'inflection'
+import { camelize, capitalize } from 'inflection'
 import type { SequelizeModels } from './sequelize'
 
 export interface AssociationEntity<T> {
@@ -13,8 +13,8 @@ export interface AssociationEntity<T> {
 }
 
 export interface BaseAssociation<F, T> {
-  from: AssociationEntity<F>
-  to: AssociationEntity<T>
+  modelA: AssociationEntity<F>
+  modelB: AssociationEntity<T>
 }
 
 export type OneToOneAssociationType = '1to1'
@@ -41,38 +41,38 @@ export type Association =
 function oneToOne(models: SequelizeModels, association: OneToOneAssociation) {
   if (association.type !== '1to1') return
 
-  const { from, to } = association
-  const FModel = models[capitalize(from.name)]
-  const TModel = models[capitalize(to.name)]
-  FModel.hasOne(TModel, from.options)
-  TModel.belongsTo(FModel, to.options)
+  const { modelA, modelB } = association
+  const FModel = models[capitalize(modelA.name)]
+  const TModel = models[capitalize(modelB.name)]
+  FModel.hasOne(TModel, modelA.options)
+  TModel.belongsTo(FModel, modelB.options)
 }
 
 function oneToN(models: SequelizeModels, association: OneToNAssociation) {
   if (association.type !== '1toN') return
 
-  const { from, to } = association
-  const FModel = models[capitalize(from.name)]
-  const TModel = models[capitalize(to.name)]
+  const { modelA, modelB } = association
+  const FModel = models[capitalize(modelA.name)]
+  const TModel = models[capitalize(modelB.name)]
 
-  FModel.hasMany(TModel, from.options)
-  TModel.belongsTo(FModel, to.options)
+  FModel.hasMany(TModel, modelA.options)
+  TModel.belongsTo(FModel, modelB.options)
 }
 
 function nToM(models: SequelizeModels, association: NtoMAssociation) {
   if (association.type !== 'NtoM') return
 
-  const { from, to, through } = association
-  const FModel = models[capitalize(from.name)]
-  const TModel = models[capitalize(to.name)]
+  const { modelA, modelB, through } = association
+  const FModel = models[capitalize(modelA.name)]
+  const TModel = models[capitalize(modelB.name)]
 
-  const throughModel = models[through]
+  const throughModel = models[camelize(through)]
 
   FModel.belongsToMany(TModel, {
     ...{ through: throughModel },
-    ...from.options,
+    ...modelA.options,
   })
-  TModel.belongsToMany(FModel, { ...{ through: throughModel }, ...to.options })
+  TModel.belongsToMany(FModel, { ...{ through: throughModel }, ...modelB.options })
 }
 
 export function defineAssociation(associations: Association[]) {
