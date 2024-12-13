@@ -4,6 +4,7 @@ import type {
   HasManyOptions,
   HasOneOptions,
 } from 'sequelize'
+import { defineNitroPlugin } from 'nitropack/runtime'
 import { camelize, capitalize } from 'inflection'
 import type { SequelizeModels } from './sequelize'
 
