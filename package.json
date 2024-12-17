@@ -1,6 +1,6 @@
 {
   "name": "nuxt-sequelize",
-  "version": "0.0.4-beta.5",
+  "version": "0.0.4-beta.6",
   "description": "Integrate Nuxt with Sequelize",
   "repository": "any-u/nuxt-sequelize",
   "license": "MIT",
