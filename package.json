@@ -33,7 +33,8 @@
     "inflection": "^3.0.0",
     "nitropack": "^2.9.7",
     "sequelize": "^6.37.4",
-    "tedious": "^18.6.1"
+    "tedious": "^18.6.1",
+    "tsx": "^4.19.2"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.5.0",

@@ -11,7 +11,7 @@ export type Attributes = ModelHandler | ModelAttributes
 
 export function defineSequelizeModel(
   attributes: Attributes,
-  options: ModelOptions,
+  options?: ModelOptions,
 ) {
   if (typeof attributes === 'function') return attributes
 

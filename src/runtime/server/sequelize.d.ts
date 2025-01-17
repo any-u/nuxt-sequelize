@@ -8,3 +8,13 @@ declare module '#sequelize' {
   const dir: string
   const options: UserOptions
 }
+
+declare module '#models' {
+  import type { Sequelize, Model, ModelStatic } from 'sequelize'
+
+  type SequelizeModelFn = (name: string, sequelize: Sequelize) => ModelStatic<Model>
+
+  type SequelizeAssociationFn = (models: Record<string, ModelStatic<Model>>) => void
+
+  const addSequelizeModels: () => Promise<Record<string, SequelizeModelFn | SequelizeAssociationFn>>
+}
