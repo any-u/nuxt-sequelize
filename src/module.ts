@@ -1,15 +1,12 @@
 import { fileURLToPath } from 'node:url'
-import fs from 'node:fs'
-import { basename, extname } from 'node:path'
 import {
-  addServerImports,
   addServerImportsDir,
   addServerPlugin,
-  addTemplate,
   createResolver,
   defineNuxtModule,
 } from '@nuxt/kit'
 import type { Options } from 'sequelize'
+import { setupComposable } from './package-utils/setup-helpers'
 
 export type UserOptions = Exclude<
   Options,
@@ -38,106 +35,13 @@ export default defineNuxtModule({
     const { resolve: resolveProject } = createResolver(nuxt.options.rootDir)
     const { resolve: resolver } = createResolver(import.meta.url)
 
+    // 1. Locate related directory
     const serverDir = fileURLToPath(
       new URL('./runtime/server', import.meta.url),
     )
     const modelsDir = resolveProject('models')
 
-    const generatedDefineModelPath = addTemplate({
-      filename: 'sequelize.define.mjs',
-      write: true,
-      getContents: async () =>
-        // fs.readFileSync(
-        //   resolver(serverDir, './utils/define-sequelize-model.ts'),
-        //   'utf-8',
-        // ),
-        [
-          'import { pluralize, underscore } from "inflection"',
-          '',
-          'export function defineSequelizeModel(attributes, options) {',
-          '  if (typeof attributes === "function") return attributes',
-          '',
-          '  return function (name, sequelize) {',
-          '    options = {',
-          '      tableName: pluralize(underscore(name)),',
-          '      ...options,',
-          '    }',
-          '    return sequelize.define(name, attributes, options)',
-          '  }',
-          '}',
-        ].join('\n'),
-    }).dst
-    addServerImports([
-      {
-        name: 'defineSequelizeModel',
-        from: generatedDefineModelPath,
-      },
-    ])
-
-    // Inject models via virtual template
-    const files = fs.readdirSync(modelsDir)
-
-    const generatedModelPathList: { name: string, path: string }[] = []
-    files.forEach((file) => {
-      const name = basename(file, extname(file))
-      const path = addTemplate({
-        filename: `sequelize.model.${name}.mjs`,
-        write: true,
-        getContents: () =>
-          [
-            `import { defineSequelizeModel } from '${generatedDefineModelPath}'`,
-            fs.readFileSync(resolveProject('models', file), 'utf-8'),
-          ].join('\n'),
-      }).dst
-
-      generatedModelPathList.push({
-        name,
-        path,
-      })
-      addServerImports([
-        {
-          name: 'default',
-          as: `${name}DefineModel`,
-          from: path,
-        },
-      ])
-    })
-
-    nuxt.options.alias['#models'] = addTemplate({
-      filename: 'sequelize.model.mjs',
-      write: true,
-      getContents: () =>
-        [
-          generatedModelPathList
-            .map(({ name, path }) => `import ${name}DefineModel from '${path}'`)
-            .join('\n'),
-          '',
-          'export const addSequelizeModels = async () => {',
-          '  const models = {}',
-          '',
-          generatedModelPathList
-            .map(({ name }) => {
-              return `  models.${name} = ${name}DefineModel`
-            })
-            .join('\n'),
-          '  return models',
-          '}',
-        ].join('\n'),
-    }).dst
-
-    // Inject options via virtual template
-    nuxt.options.alias['#sequelize'] = addTemplate({
-      filename: 'sequelize.mjs',
-      write: true,
-      getContents: () =>
-        Object.entries(options)
-          .map(
-            ([key, value]) =>
-              `export const ${key} = ${JSON.stringify(value, null, 2)}
-      `,
-          )
-          .join('\n'),
-    }).dst
+    setupComposable({ modelsDir, nuxt, options })
 
     addServerImportsDir(resolver(serverDir, './composables'))
 
