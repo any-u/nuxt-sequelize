@@ -16,5 +16,5 @@ declare module '#models' {
 
   type SequelizeAssociationFn = (models: Record<string, ModelStatic<Model>>) => void
 
-  const addSequelizeModels: () => Promise<Record<string, SequelizeModelFn | SequelizeAssociationFn>>
+  const loadSequelizeModels: () => Promise<Record<string, SequelizeModelFn | SequelizeAssociationFn>>
 }
