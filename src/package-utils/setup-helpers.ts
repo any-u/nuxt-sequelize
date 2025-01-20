@@ -47,28 +47,27 @@ export function setupComposable({ modelsDir, nuxt, options }: ComposableSetupOpt
         '',
         'declare global {',
         '  export function defineSequelizeModel<T extends ModelAttributes>(attributes: T, options: ModelOptions): (name: string, sequelize: any) => Model<T>',
+        '}',
+        '',
       ].join('\n'),
   })
 
   // 3. add model files
   const files = fs.readdirSync(modelsDir)
-  const generatedModelPathList: Array<{ name: string, path: string }> = []
+  const generatedModelPathList: Array<string> = []
   files.forEach((file) => {
     const name = basename(file, extname(file))
-    const path = addTemplate({
-      filename: `sequelize.model.${name}.mjs`,
+    addTemplate({
+      filename: `models/${name}.mjs`,
       write: true,
       getContents: () =>
         [
           `import { defineSequelizeModel } from '${generatedDefineModelPath}'`,
           fs.readFileSync(resolve(modelsDir, file), 'utf-8'),
         ].join('\n'),
-    }).dst
-
-    generatedModelPathList.push({
-      name,
-      path,
     })
+
+    generatedModelPathList.push(name)
   })
 
   // 4. add model imports by #models alias
@@ -78,18 +77,18 @@ export function setupComposable({ modelsDir, nuxt, options }: ComposableSetupOpt
     getContents: () =>
       [
         generatedModelPathList
-          .map(({ name, path }) => `import ${name}DefineModel from '${path}'`)
+          .map(name => `import ${name}DefineModel from './${name}.mjs'`)
           .join('\n'),
         '',
         'export const addSequelizeModels = async () => {',
         '  const models = {',
-        '',
         generatedModelPathList
-          .map(({ name }) => {
-            return `  ${name} : ${name}DefineModel`
+          .map((name) => {
+            return `    ${name}: ${name}DefineModel`
           })
           .join('\n'),
-        '}',
+        '  }',
+        '',
         '  return models',
         '}',
       ].join('\n'),
