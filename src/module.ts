@@ -47,10 +47,25 @@ export default defineNuxtModule({
       filename: 'sequelize.define.mjs',
       write: true,
       getContents: async () =>
-        fs.readFileSync(
-          resolver(serverDir, './utils/define-sequelize-model.ts'),
-          'utf-8',
-        ),
+        // fs.readFileSync(
+        //   resolver(serverDir, './utils/define-sequelize-model.ts'),
+        //   'utf-8',
+        // ),
+        [
+          'import { pluralize, underscore } from "inflection"',
+          '',
+          'export function defineSequelizeModel(attributes, options) {',
+          '  if (typeof attributes === "function") return attributes',
+          '',
+          '  return function (name, sequelize) {',
+          '    options = {',
+          '      tableName: pluralize(underscore(name)),',
+          '      ...options,',
+          '    }',
+          '    return sequelize.define(name, attributes, options)',
+          '  }',
+          '}',
+        ].join('\n'),
     }).dst
     addServerImports([
       {
