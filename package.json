@@ -49,5 +49,8 @@
     "typescript": "latest",
     "vitest": "^2.1.1",
     "vue-tsc": "^2.1.6"
+  },
+  "peerDependencies": {
+    "inflection": "^3.0.0"
   }
 }
