@@ -32,6 +32,7 @@
     "@nuxt/kit": "^3.13.2",
     "inflection": "^3.0.0",
     "nitropack": "^2.9.7",
+    "nypm": "^0.5.0",
     "sequelize": "^6.37.4",
     "tedious": "^18.6.1",
     "tsx": "^4.19.2"
@@ -49,8 +50,5 @@
     "typescript": "latest",
     "vitest": "^2.1.1",
     "vue-tsc": "^2.1.6"
-  },
-  "peerDependencies": {
-    "inflection": "^3.0.0"
   }
 }
