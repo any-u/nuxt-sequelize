@@ -1,6 +1,6 @@
 {
   "name": "nuxt-sequelize",
-  "version": "0.0.5-beta.3",
+  "version": "0.0.5-beta.4",
   "description": "Integrate Nuxt with Sequelize",
   "repository": "any-u/nuxt-sequelize",
   "license": "MIT",
@@ -32,7 +32,6 @@
     "@nuxt/kit": "^3.13.2",
     "inflection": "^3.0.0",
     "nitropack": "^2.9.7",
-    "nypm": "^0.5.0",
     "sequelize": "^6.37.4",
     "tedious": "^18.6.1",
     "tsx": "^4.19.2"

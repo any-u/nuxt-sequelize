@@ -6,7 +6,6 @@ import {
   defineNuxtModule,
 } from '@nuxt/kit'
 import type { Options } from 'sequelize'
-import { ensureDependencyInstalled } from 'nypm'
 import { setupComposable } from './package-utils/setup-helpers'
 
 export type UserOptions = Exclude<
@@ -36,29 +35,16 @@ export default defineNuxtModule({
     const { resolve: resolveProject } = createResolver(nuxt.options.rootDir)
     const { resolve: resolver } = createResolver(import.meta.url)
 
-    // 1. ensure dependencies installed
-    try {
-      await ensureDependencyInstalled('sequelize', {
-        cwd: resolveProject(),
-      })
-      await ensureDependencyInstalled('inflection', {
-        cwd: resolveProject(),
-      })
-    }
-    catch {
-      console.error('Failed to install dependencies')
-    }
-
-    // 2. Locate related directory
+    // 1. Locate related directory
     const serverDir = fileURLToPath(
       new URL('./runtime/server', import.meta.url),
     )
     const modelsDir = resolveProject(options.dir)
 
-    // 3. Setup composable
+    // 2. Setup composable
     setupComposable({ modelsDir, nuxt, options })
 
-    // 4. Add imports and plugins
+    // 3. Add imports and plugins
     addServerImportsDir(resolver(serverDir, './composables'))
 
     addServerPlugin(resolver(serverDir, './plugins/sequelize-client'))
