@@ -36,54 +36,53 @@ export function setupComposable({ modelsDir, nuxt, options }: ComposableSetupOpt
       ].join('\n'),
   }).dst
 
-  // 2. add defineAssociation
-  addTemplate({
-    filename: 'sequelize.define-association.mjs',
+  // 2. add defineSequelizeAssociation
+  const generatedDefineAssociationPath = addTemplate({
+    filename: 'sequelize.define-sequelize-association.mjs',
     write: true,
     getContents: async () =>
       [
-        'function camelize(str) {',
-        '  return str.replace(/(?:^|[-_])(\w)/g, (_, c) => c ? c.toUpperCase() : "")',
-        '}',
+        'import { camelize } from "inflection"',
         '',
         'function oneToOne(models, association) {',
         '  if (association.type !== "1to1") return',
         '',
         '  const { modelA, modelB } = association',
-        '  const FModel = models[camelize(modelA.name)]',
-        '  const TModel = models[camelize(modelB.name)]',
-        '  FModel.hasOne(TModel, modelA.options)',
-        '  TModel.belongsTo(FModel, modelB.options)',
+        '  const ModelA = models[camelize(modelA.name)]',
+        '  const ModelB = models[camelize(modelB.name)]',
+        '',
+        '  ModelA.hasOne(ModelB, modelA.options)',
+        '  ModelB.belongsTo(ModelA, modelB.options)',
         '}',
         '',
         'function oneToN(models, association) {',
         '  if (association.type !== "1toN") return',
         '',
         '  const { modelA, modelB } = association',
-        '  const FModel = models[camelize(modelA.name)]',
-        '  const TModel = models[camelize(modelB.name)]',
+        '  const ModelA = models[camelize(modelA.name)]',
+        '  const ModelB = models[camelize(modelB.name)]',
         '',
-        '  FModel.hasMany(TModel, modelA.options)',
-        '  TModel.belongsTo(FModel, modelB.options)',
+        '  ModelA.hasMany(ModelB, modelA.options)',
+        '  ModelB.belongsTo(ModelA, modelB.options)',
         '}',
         '',
         'function nToM(models, association) {',
         '  if (association.type !== "NtoM") return',
         '',
         '  const { modelA, modelB, through } = association',
-        '  const FModel = models[camelize(modelA.name)]',
-        '  const TModel = models[camelize(modelB.name)]',
+        '  const ModelA = models[camelize(modelA.name)]',
+        '  const ModelB = models[camelize(modelB.name)]',
         '',
         '  const throughModel = models[camelize(through)]',
         '',
-        '  FModel.belongsToMany(TModel, {',
+        '  ModelA.belongsToMany(ModelB, {',
         '    ...{ through: throughModel },',
         '    ...modelA.options,',
         '  })',
-        '  TModel.belongsToMany(FModel, { ...{ through: throughModel }, ...modelB.options })',
+        '  ModelB.belongsToMany(ModelA, { ...{ through: throughModel }, ...modelB.options })',
         '}',
         '',
-        'export function defineAssociation(associations) {',
+        'export function defineSequelizeAssociation(associations) {',
         '  return function (sequelize) {',
         '    for (const association of associations) {',
         '      switch (association.type) {',
@@ -101,11 +100,10 @@ export function setupComposable({ modelsDir, nuxt, options }: ComposableSetupOpt
         '  }',
         '}',
         '',
-        'export default defineAssociation',
       ].join('\n'),
-  })
+  }).dst
 
-  // 3. add defineSequelizeModel type and defineAssociation type
+  // 3. add defineSequelizeModel type and defineSequelizeAssociation type
   addTypeTemplate({
     filename: 'types/sequelize.d.ts',
     getContents: () =>
@@ -147,7 +145,7 @@ export function setupComposable({ modelsDir, nuxt, options }: ComposableSetupOpt
         '',
         'declare global {',
         '  export function defineSequelizeModel<T extends ModelAttributes>(attributes: T, options?: ModelOptions): (name: string, sequelize: any) => Model<T>',
-        '  export function defineAssociation(associations: Association[]): void',
+        '  export function defineSequelizeAssociation(associations: Association[]): void',
         '}',
         '',
       ].join('\n'),
@@ -158,16 +156,28 @@ export function setupComposable({ modelsDir, nuxt, options }: ComposableSetupOpt
   const generatedModelPathList: Array<string> = []
   files.forEach((file) => {
     const name = basename(file, extname(file))
-    addTemplate({
-      filename: `models/${name}.mjs`,
-      write: true,
-      getContents: () =>
-        [
-          `import { defineSequelizeModel } from '${generatedDefineModelPath}'`,
-          fs.readFileSync(resolve(modelsDir, file), 'utf-8'),
-        ].join('\n'),
-    })
-
+    if (name === 'associations') {
+      addTemplate({
+        filename: `models/${name}.mjs`,
+        write: true,
+        getContents: () =>
+          [
+            `import { defineSequelizeAssociation } from '${generatedDefineAssociationPath}'`,
+            fs.readFileSync(resolve(modelsDir, file), 'utf-8'),
+          ].join('\n'),
+      })
+    }
+    else {
+      addTemplate({
+        filename: `models/${name}.mjs`,
+        write: true,
+        getContents: () =>
+          [
+            `import { defineSequelizeModel } from '${generatedDefineModelPath}'`,
+            fs.readFileSync(resolve(modelsDir, file), 'utf-8'),
+          ].join('\n'),
+      })
+    }
     generatedModelPathList.push(name)
   })
 
@@ -185,7 +195,7 @@ export function setupComposable({ modelsDir, nuxt, options }: ComposableSetupOpt
         '  const models = {',
         generatedModelPathList
           .map((name) => {
-            return `    ${name}: ${name}DefineModel`
+            return `    ${name}: ${name}DefineModel,`
           })
           .join('\n'),
         '  }',

@@ -10,10 +10,7 @@ export type SequelizeModels = Record<string, ModelStatic<Model<any, any>>>
 export default defineNitroPlugin(async () => {
   const sequelize = {} as SequelizeModels
 
-  // load sequelize client
   const client = useSequelizeClient()
-
-  // load sequelize models
   const models = await loadSequelizeModels()
 
   let associationFn = null
@@ -34,8 +31,6 @@ export default defineNitroPlugin(async () => {
   if (associationFn) {
     associationFn(sequelize)
   }
-
-  // client.sync({ force: true })
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore

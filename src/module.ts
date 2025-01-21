@@ -41,11 +41,12 @@ export default defineNuxtModule({
     )
     const modelsDir = resolveProject('models')
 
+    // 2. Setup composable
     setupComposable({ modelsDir, nuxt, options })
 
+    // 3. Add imports and plugins
     addServerImportsDir(resolver(serverDir, './composables'))
 
-    addServerPlugin(resolver(serverDir, './plugins/define-association'))
     addServerPlugin(resolver(serverDir, './plugins/sequelize-client'))
     addServerPlugin(resolver(serverDir, './plugins/sequelize'))
   },
