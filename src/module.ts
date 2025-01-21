@@ -39,7 +39,7 @@ export default defineNuxtModule({
     const serverDir = fileURLToPath(
       new URL('./runtime/server', import.meta.url),
     )
-    const modelsDir = resolveProject('models')
+    const modelsDir = resolveProject(options.dir)
 
     // 2. Setup composable
     setupComposable({ modelsDir, nuxt, options })
