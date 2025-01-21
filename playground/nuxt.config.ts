@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   modules: ['../src/module'],
   devtools: { enabled: true },
   sequelize: {
-    dir: 'playground/models',
+    dir: 'models',
     options: {
       pool: {
         max: 5,
